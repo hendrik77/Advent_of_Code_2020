@@ -21,15 +21,9 @@ CLASS zexpense_report DEFINITION
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA riddle TYPE zexpense_report=>in_type.
-
-
 ENDCLASS.
 
-
-
 CLASS zexpense_report IMPLEMENTATION.
-
-
 
   METHOD add_2for_2020.
     DATA(desc_values) = input_values.
@@ -49,12 +43,30 @@ CLASS zexpense_report IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
-  METHOD if_oo_adt_classrun~main.
-    out->write( add_2for_2020( riddle ) ).
-    out->write( add_3for_2020( riddle ) ).
-
+  METHOD add_3for_2020.
+    DATA(desc_values) = input_values.
+    DATA(asc_values) = input_values.
+    SORT desc_values DESCENDING.
+    SORT asc_values ASCENDING.
+    LOOP AT desc_values ASSIGNING FIELD-SYMBOL(<desc1>).
+      LOOP AT desc_values ASSIGNING FIELD-SYMBOL(<desc2>).
+        LOOP AT asc_values ASSIGNING FIELD-SYMBOL(<asc>).
+          DATA(sum) = <desc1> + <desc2> + <asc>.
+          IF sum = 2020.
+            result = <desc1> * <desc2> * <asc>.
+            RETURN.
+          ELSEIF sum > 2020.
+            EXIT.
+          ENDIF.
+        ENDLOOP.
+      ENDLOOP.
+    ENDLOOP.
   ENDMETHOD.
 
+  METHOD if_oo_adt_classrun~main.
+    out->write( |Expense account 2 entries sum 2020 are multiplied: | && add_2for_2020( riddle ) ).
+    out->write( |Expense account 3 entries sum 2020 are multiplied: | && add_3for_2020( riddle ) ).
+  ENDMETHOD.
 
   METHOD constructor.
     me->riddle = VALUE #(
@@ -259,27 +271,6 @@ CLASS zexpense_report IMPLEMENTATION.
       ( 1560 )
       ( 1667 )
     ).
-  ENDMETHOD.
-
-
-  METHOD add_3for_2020.
-    DATA(desc_values) = input_values.
-    DATA(asc_values) = input_values.
-    SORT desc_values DESCENDING.
-    SORT asc_values ASCENDING.
-    LOOP AT desc_values ASSIGNING FIELD-SYMBOL(<desc1>).
-      LOOP AT desc_values ASSIGNING FIELD-SYMBOL(<desc2>).
-        LOOP AT asc_values ASSIGNING FIELD-SYMBOL(<asc>).
-          DATA(sum) = <desc1> + <desc2> + <asc>.
-          IF sum = 2020.
-            result = <desc1> * <desc2> * <asc>.
-            RETURN.
-          ELSEIF sum > 2020.
-            EXIT.
-          ENDIF.
-        ENDLOOP.
-      ENDLOOP.
-    ENDLOOP.
   ENDMETHOD.
 
 ENDCLASS.

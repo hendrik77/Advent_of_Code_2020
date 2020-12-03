@@ -40,9 +40,7 @@ CLASS ltcl_expense_report IMPLEMENTATION.
 
 
   METHOD setup.
-
     expense_report = NEW zexpense_report( ).
-
   ENDMETHOD.
 
 ENDCLASS.
