@@ -12,7 +12,6 @@ CLASS ztoboggan DEFINITION
              down,
              up,
            END OF ENUM ty_orientation,
-
            BEGIN OF ty_slope_part,
              course TYPE ty_orientation,
              length TYPE i,
@@ -22,8 +21,7 @@ CLASS ztoboggan DEFINITION
              y TYPE i,
            END OF ty_pointer,
            ty_slope    TYPE STANDARD TABLE OF ty_slope_part WITH EMPTY KEY,
-           ty_map_line TYPE STANDARD TABLE OF string WITH EMPTY KEY,
-           ty_map      TYPE STANDARD TABLE OF ty_map_line WITH EMPTY KEY.
+           ty_map      TYPE STANDARD TABLE OF string_table WITH EMPTY KEY.
 
     METHODS count_encountered_trees
       IMPORTING
@@ -149,7 +147,7 @@ CLASS ztoboggan IMPLEMENTATION.
 
     SPLIT i_map AT cl_abap_char_utilities=>newline INTO TABLE DATA(string_map).
 
-    DATA map_line TYPE ty_map_line.
+    DATA map_line TYPE string_table.
     LOOP AT string_map INTO DATA(string_line).
       DO strlen( string_line ) TIMES.
         DATA(letter) = substring( val = string_line off = sy-index - 1 len = 1 ).

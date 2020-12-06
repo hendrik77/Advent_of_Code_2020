@@ -17,7 +17,7 @@ CLASS ltcl_toboggan DEFINITION FINAL FOR TESTING
       riddle_part1 FOR TESTING RAISING cx_static_check,
       check_slopes FOR TESTING RAISING cx_static_check,
       riddle_part2 FOR TESTING RAISING cx_static_check,
-    down_3 FOR TESTING RAISING cx_static_check,
+      down_3 FOR TESTING RAISING cx_static_check,
       setup.
 ENDCLASS.
 
@@ -49,7 +49,7 @@ CLASS ltcl_toboggan IMPLEMENTATION.
       |.#..#...#.#|.
     toboggan->set_map( map ).
     DATA(slope) = VALUE ztoboggan=>ty_slope( ( course = ztoboggan=>right length = 3 )
-                                             ( course = ztoboggan=>down length = 1 ) ).
+                                             ( course = ztoboggan=>down  length = 1 ) ).
     toboggan->set_slope( slope ).
     toboggan->traverse( ).
 
@@ -72,8 +72,8 @@ CLASS ltcl_toboggan IMPLEMENTATION.
       |.#..#...#.#|.
 
     DATA(slope) = VALUE ztoboggan=>ty_slope( ( course = ztoboggan=>right length = 1 )
-                                             ( course = ztoboggan=>down length = 2 ) ).
-    data(trees) = toboggan->traverse_slope( map = map slope = slope ).
+                                             ( course = ztoboggan=>down  length = 2 ) ).
+    DATA(trees) = toboggan->traverse_slope( map = map slope = slope ).
 
     cl_abap_unit_assert=>assert_equals( exp = 2 act = trees ).
 
@@ -95,24 +95,24 @@ CLASS ltcl_toboggan IMPLEMENTATION.
       |.#..#...#.#|.
 
     DATA(slope) = VALUE ztoboggan=>ty_slope( ( course = ztoboggan=>right length = 1 )
-                                             ( course = ztoboggan=>down length = 1 ) ).
+                                             ( course = ztoboggan=>down  length = 1 ) ).
     trees *= toboggan->traverse_slope( map = map slope = slope ).
 
 
     slope = VALUE ztoboggan=>ty_slope( ( course = ztoboggan=>right length = 3 )
-                                       ( course = ztoboggan=>down length = 1 ) ).
+                                       ( course = ztoboggan=>down  length = 1 ) ).
     trees *= toboggan->traverse_slope( map = map slope = slope ).
 
     slope = VALUE ztoboggan=>ty_slope( ( course = ztoboggan=>right length = 5 )
-                                       ( course = ztoboggan=>down length = 1 ) ).
+                                       ( course = ztoboggan=>down  length = 1 ) ).
     trees *= toboggan->traverse_slope( map = map slope = slope ).
 
     slope = VALUE ztoboggan=>ty_slope( ( course = ztoboggan=>right length = 7 )
-                                       ( course = ztoboggan=>down length = 1 ) ).
+                                       ( course = ztoboggan=>down  length = 1 ) ).
     trees *= toboggan->traverse_slope( map = map slope = slope ).
 
     slope = VALUE ztoboggan=>ty_slope( ( course = ztoboggan=>right length = 1 )
-                                       ( course = ztoboggan=>down length = 2 ) ).
+                                       ( course = ztoboggan=>down  length = 2 ) ).
     trees *= toboggan->traverse_slope( map = map slope = slope ).
 
     cl_abap_unit_assert=>assert_equals( msg = '2x7x3x4x2 = 336' exp = 336 act = trees ).
@@ -123,24 +123,24 @@ CLASS ltcl_toboggan IMPLEMENTATION.
     DATA(map) = toboggan->get_riddle_input( ).
 
     DATA(slope) = VALUE ztoboggan=>ty_slope( ( course = ztoboggan=>right length = 1 )
-                                             ( course = ztoboggan=>down length = 1 ) ).
+                                             ( course = ztoboggan=>down  length = 1 ) ).
     trees *= toboggan->traverse_slope( map = map slope = slope ).
 
 
     slope = VALUE ztoboggan=>ty_slope( ( course = ztoboggan=>right length = 3 )
-                                       ( course = ztoboggan=>down length = 1 ) ).
+                                       ( course = ztoboggan=>down  length = 1 ) ).
     trees *= toboggan->traverse_slope( map = map slope = slope ).
 
     slope = VALUE ztoboggan=>ty_slope( ( course = ztoboggan=>right length = 5 )
-                                       ( course = ztoboggan=>down length = 1 ) ).
+                                       ( course = ztoboggan=>down  length = 1 ) ).
     trees *= toboggan->traverse_slope( map = map slope = slope ).
 
     slope = VALUE ztoboggan=>ty_slope( ( course = ztoboggan=>right length = 7 )
-                                       ( course = ztoboggan=>down length = 1 ) ).
+                                       ( course = ztoboggan=>down  length = 1 ) ).
     trees *= toboggan->traverse_slope( map = map slope = slope ).
 
     slope = VALUE ztoboggan=>ty_slope( ( course = ztoboggan=>right length = 1 )
-                                       ( course = ztoboggan=>down length = 2 ) ).
+                                       ( course = ztoboggan=>down  length = 2 ) ).
     trees *= toboggan->traverse_slope( map = map slope = slope ).
 
     cl_abap_unit_assert=>assert_equals( msg = 'trees = ?' exp = 2421944712 act = trees ).
@@ -204,7 +204,7 @@ CLASS ltcl_toboggan IMPLEMENTATION.
       |#..|.
     toboggan->set_map( map ).
     DATA(slope) = VALUE ztoboggan=>ty_slope( ( course = ztoboggan=>right length = 3 )
-                                             ( course = ztoboggan=>down length = 1 ) ).
+                                             ( course = ztoboggan=>down  length = 1 ) ).
     toboggan->set_slope( slope ).
 
     "act
@@ -225,49 +225,29 @@ CLASS ltcl_toboggan IMPLEMENTATION.
       |#|.
     toboggan->set_map( map ).
     DATA(exp_map) = VALUE ztoboggan=>ty_map(
-      ( VALUE ztoboggan=>ty_map_line( (  |.| )  ) )
-      ( VALUE ztoboggan=>ty_map_line( (  |#| )  ) )
-     ).
+      ( VALUE string_table( (  |.| )  ) )
+      ( VALUE string_table( (  |#| )  ) ) ).
     cl_abap_unit_assert=>assert_equals( msg = 'maps' exp = exp_map act = toboggan->map ).
     DATA(field) = toboggan->map[ 2 ][ 1 ].
     cl_abap_unit_assert=>assert_equals( msg = 'tree at 1,3' exp = '#' act = field ).
   ENDMETHOD.
 
   METHOD get_map.
+    "arrange
     DATA(map) =
          |..##.......\n| &&
-         |#...#...#..|." &&
-*      |.#....#..#.\n| &&
-*      |..#.#...#.#\n| &&
-*      |.#...##..#.\n| &&
-*      |..#.##.....\n| &&
-*      |.#.#.#....#\n| &&
-*      |.#........#\n| &&
-*      |#.##...#...\n| &&
-*      |#...##....#\n| &&
-*      |.#..#...#.#|.
-
+         |#...#...#..|."
     toboggan->set_map( map ).
 
+    "act
     DATA(actual_map) = toboggan->get_map( ).
-    cl_abap_unit_assert=>assert_equals( msg = 'maps' exp = map act = actual_map ).
 
+    "assert
+    cl_abap_unit_assert=>assert_equals( msg = 'maps' exp = map act = actual_map ).
   ENDMETHOD.
 
   METHOD setup.
     toboggan = NEW ztoboggan( ).
   ENDMETHOD.
-* DATA(map) =
-*      |..##.......\n| &&
-*      |#...#...#..\n| &&
-*      |.#....#..#.\n| &&
-*      |..#.#...#.#\n| &&
-*      |.#...##..#.\n| &&
-*      |..#.##.....\n| &&
-*      |.#.#.#....#\n| &&
-*      |.#........#\n| &&
-*      |#.##...#...\n| &&
-*      |#...##....#\n| &&
-*      |.#..#...#.#|.
 
 ENDCLASS.
