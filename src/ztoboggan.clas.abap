@@ -23,16 +23,12 @@ CLASS ztoboggan DEFINITION
            ty_slope    TYPE STANDARD TABLE OF ty_slope_part WITH EMPTY KEY,
            ty_map      TYPE STANDARD TABLE OF string_table WITH EMPTY KEY.
 
-    METHODS count_encountered_trees
-      IMPORTING
-        slope        TYPE ty_map
-      RETURNING
-        VALUE(trees) TYPE i.
+
     METHODS set_map
       IMPORTING
         i_map TYPE string.
     METHODS traverse.
-    METHODS constructor.
+
     METHODS set_slope
       IMPORTING i_slope TYPE ty_slope.
     METHODS count_trees
@@ -75,14 +71,6 @@ ENDCLASS.
 
 CLASS ztoboggan IMPLEMENTATION.
 
-  METHOD constructor.
-
-  ENDMETHOD.
-
-  METHOD count_encountered_trees.
-
-  ENDMETHOD.
-
   METHOD set_map.
     map = convert_str_to_itab( i_map ).
   ENDMETHOD.
@@ -112,8 +100,7 @@ CLASS ztoboggan IMPLEMENTATION.
           map[ pointer-y ][ pointer-x ] = SWITCH #( map[ pointer-y ][ pointer-x ]
                                                     WHEN '.' THEN 'O'
                                                     WHEN '#' THEN 'X' ).
-        CATCH cx_root INTO DATA(cx).
-
+        CATCH CX_SY_ITAB_LINE_NOT_FOUND INTO DATA(cx).
 
           IF pointer-x >= lines( map[ 1 ] ).
             DATA(columns) = lines( shadow_map[ 1 ] ).
@@ -144,19 +131,17 @@ CLASS ztoboggan IMPLEMENTATION.
 
 
   METHOD convert_str_to_itab.
-
     SPLIT i_map AT cl_abap_char_utilities=>newline INTO TABLE DATA(string_map).
 
     DATA map_line TYPE string_table.
     LOOP AT string_map INTO DATA(string_line).
       DO strlen( string_line ) TIMES.
-        DATA(letter) = substring( val = string_line off = sy-index - 1 len = 1 ).
-        APPEND letter TO map_line.
+        DATA(square) = substring( val = string_line off = sy-index - 1 len = 1 ).
+        APPEND square TO map_line.
       ENDDO.
       APPEND map_line TO map_tab.
       CLEAR map_line.
     ENDLOOP.
-
   ENDMETHOD.
 
 
@@ -166,9 +151,9 @@ CLASS ztoboggan IMPLEMENTATION.
                         str = str && REDUCE #( INIT str_line = ||
                                                FOR line IN map_line NEXT
                                                str_line = str_line && line )
-                                  && COND #( WHEN i < lines( i_map ) THEN cl_abap_char_utilities=>newline ) ).
+                                  && COND #( WHEN i < lines( i_map )
+                                             THEN cl_abap_char_utilities=>newline ) ).
   ENDMETHOD.
-
 
   METHOD count_trees.
     DATA(string_map) = convert_itab_to_str( map ).
