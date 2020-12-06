@@ -63,8 +63,7 @@ CLASS zpw_policy IMPLEMENTATION.
     DATA(letter) = get_letter( policy ).
     DATA(password) = get_pw( policy ).
     DATA(letter_count) = count( val = password sub = letter ).
-    valid = COND #( WHEN letter_count >= min
-                      AND letter_count <= max
+    valid = COND #( WHEN letter_count BETWEEN min AND max
                      THEN abap_true
                      ELSE abap_false ).
   ENDMETHOD.
