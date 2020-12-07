@@ -11,11 +11,6 @@ CLASS zpassport DEFINITION
       IMPORTING
         i_file TYPE string.
 
-
-
-
-
-
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA: passports TYPE string_table.
@@ -77,18 +72,14 @@ CLASS zpassport DEFINITION
       IMPORTING
         file                   TYPE string OPTIONAL
       RETURNING
-        value(valid_passports) TYPE i.
-
-
+        VALUE(valid_passports) TYPE i.
 ENDCLASS.
-
-
 
 CLASS zpassport IMPLEMENTATION.
 
   METHOD if_oo_adt_classrun~main.
     DATA(valid_passports) = count_valid( get_riddle_input( ) ).
-    out->write( |valid passport: | && valid_passports ).
+    out->write( |valid passports: | && valid_passports ).
   ENDMETHOD.
 
   METHOD count_valid.
@@ -103,9 +94,7 @@ CLASS zpassport IMPLEMENTATION.
                                              ELSE 0 ) ).
   ENDMETHOD.
 
-
   METHOD build_passport_table.
-
     APPEND INITIAL LINE TO passports.
     DATA(row) = 1.
     SPLIT file AT |\n| INTO TABLE DATA(file_w_empty).
@@ -117,9 +106,7 @@ CLASS zpassport IMPLEMENTATION.
         APPEND INITIAL LINE TO passports.
       ENDIF.
     ENDLOOP.
-
   ENDMETHOD.
-
 
   METHOD passport_valid.
     "byr (Birth Year)
@@ -153,6 +140,57 @@ CLASS zpassport IMPLEMENTATION.
     "cid (Country ID) --> not checked
 
     valid = abap_true.
+  ENDMETHOD.
+
+  METHOD set_file.
+    passports = build_passport_table( i_file ).
+  ENDMETHOD.
+
+  METHOD check_year.
+    IF year BETWEEN first AND second.
+      valid = abap_true.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD check_byr.
+    valid = check_year( year = year first = 1920 second = 2002 ).
+  ENDMETHOD.
+
+  METHOD check_iyr.
+    valid = check_year( year = year first = 2010 second = 2020 ).
+  ENDMETHOD.
+
+  METHOD check_eyr.
+    valid = check_year( year = year first = 2020 second = 2030 ).
+  ENDMETHOD.
+
+  METHOD check_hgt.
+    valid = COND #( WHEN find( val = height sub = |in| ) > -1
+                    THEN COND #( WHEN substring_before( val = height sub = |in| ) BETWEEN 59 AND 76
+                                 THEN abap_true )
+                    WHEN find( val = height sub = |cm| ) > -1
+                    THEN COND #( WHEN substring_before( val = height sub = |cm| ) BETWEEN 150 AND 193
+                                 THEN abap_true ) ).
+  ENDMETHOD.
+
+  METHOD check_hcl.
+    valid = cl_abap_matcher=>matches( text = hcl pattern = '^#(\d|[a-f]){6}' ).
+  ENDMETHOD.
+
+  METHOD check_ecl.
+    valid = COND #( WHEN ecl = 'amb'
+                      OR ecl = 'blu'
+                      OR ecl = 'brn'
+                      OR ecl = 'gry'
+                      OR ecl = 'grn'
+                      OR ecl = 'hzl'
+                      OR ecl = 'oth'
+                    THEN abap_true ).
+  ENDMETHOD.
+
+  METHOD check_pid.
+    valid = COND #( WHEN strlen( pid ) = 9
+                    THEN cl_abap_matcher=>matches( text = pid pattern = '\d{9}' ) ).
   ENDMETHOD.
 
   METHOD get_riddle_input.
@@ -1257,62 +1295,6 @@ CLASS zpassport IMPLEMENTATION.
     |hgt:171cm\n| &&
     |\n| &&
     |ecl:#ae12d3 hgt:74cm cid:239 hcl:z pid:345439730 iyr:1924 byr:2029 eyr:2031|.
-  ENDMETHOD.
-
-
-  METHOD set_file.
-    passports = build_passport_table( i_file ).
-  ENDMETHOD.
-
-  METHOD check_year.
-    IF year BETWEEN first AND second.
-      valid = abap_true.
-    ENDIF.
-  ENDMETHOD.
-
-  METHOD check_byr.
-    valid = check_year( year = year first = 1920 second = 2002 ).
-  ENDMETHOD.
-
-  METHOD check_iyr.
-    valid = check_year( year = year first = 2010 second = 2020 ).
-  ENDMETHOD.
-
-  METHOD check_eyr.
-    valid = check_year( year = year first = 2020 second = 2030 ).
-  ENDMETHOD.
-
-
-  METHOD check_hgt.
-    valid = COND #( WHEN find( val = height sub = |in| ) > -1
-                    THEN COND #( WHEN substring_before( val = height sub = |in| ) BETWEEN 59 AND 76
-                                 THEN abap_true )
-                    WHEN find( val = height sub = |cm| ) > -1
-                    THEN COND #( WHEN substring_before( val = height sub = |cm| ) BETWEEN 150 AND 193
-                                 THEN abap_true ) ).
-  ENDMETHOD.
-
-
-  METHOD check_hcl.
-    valid = cl_abap_matcher=>matches( text = hcl pattern = '^#(\d|[a-f]){6}' ).
-  ENDMETHOD.
-
-
-  METHOD check_ecl.
-    valid = COND #( WHEN ecl = 'amb'
-                      OR ecl = 'blu'
-                      OR ecl = 'brn'
-                      OR ecl = 'gry'
-                      OR ecl = 'grn'
-                      OR ecl = 'hzl'
-                      OR ecl = 'oth'
-                    THEN abap_true ).
-  ENDMETHOD.
-
-
-  METHOD check_pid.
-    valid = COND #( WHEN strlen( pid ) = 9
-                    THEN cl_abap_matcher=>matches( text = pid pattern = '\d{9}' ) ).
   ENDMETHOD.
 
 ENDCLASS.

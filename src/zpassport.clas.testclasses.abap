@@ -54,11 +54,9 @@ CLASS ltcl_passport IMPLEMENTATION.
     valid = passport->check_hgt( |190in| ).
     "assert
     cl_abap_unit_assert=>assert_false( msg = '190in is invalid' act = valid ).
-
   ENDMETHOD.
 
   METHOD check_hcl.
-
     DATA(valid) = passport->check_hcl( hcl = |#123abc| ).
 
     cl_abap_unit_assert=>assert_true( msg = |hcl valid:   #123abc| act = valid ).
@@ -69,21 +67,17 @@ CLASS ltcl_passport IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD check_ecl.
-    DATA valid TYPE xsdboolean.
-    valid = passport->check_ecl( ecl = |brn| ).
+    DATA(valid) = passport->check_ecl( ecl = |brn| ).
     cl_abap_unit_assert=>assert_true( msg = |ecl valid:   brn| act = valid ).
     valid = passport->check_ecl( ecl = |wat| ).
     cl_abap_unit_assert=>assert_false( msg = |ecl invalid: wat| act = valid ).
   ENDMETHOD.
 
   METHOD check_pid.
-    DATA valid TYPE xsdboolean.
-    valid = passport->check_pid( pid = |000000001| ).
+    DATA(valid) = passport->check_pid( pid = |000000001| ).
     cl_abap_unit_assert=>assert_true( msg = |pid valid:   000000001| act = valid ).
     valid = passport->check_ecl( ecl = |0123456789| ).
     cl_abap_unit_assert=>assert_false( msg = |pid invalid: 0123456789| act = valid ).
-
-
   ENDMETHOD.
 
   METHOD check_byr.
@@ -99,19 +93,16 @@ CLASS ltcl_passport IMPLEMENTATION.
 
     "act
     valid = passport->check_byr( 2002 ).
-
     "assert
     cl_abap_unit_assert=>assert_equals( msg = '2002 is valid' exp = abap_true act = valid ).
 
     "act
     valid = passport->check_byr( 1920 ).
-
     "assert
     cl_abap_unit_assert=>assert_equals( msg = '1920 is valid' exp = abap_true act = valid ).
 
     "act
     valid = passport->check_byr( 1919 ).
-
     "assert
     cl_abap_unit_assert=>assert_equals( msg = '1919 is invalid' exp = abap_false act = valid ).
   ENDMETHOD.
@@ -122,25 +113,21 @@ CLASS ltcl_passport IMPLEMENTATION.
 
     "act
     DATA(valid) = passport->check_iyr( 2021 ).
-
     "assert
     cl_abap_unit_assert=>assert_equals( msg = '2021 is invalid' exp = abap_false act = valid ).
 
     "act
     valid = passport->check_iyr( 2020 ).
-
     "assert
     cl_abap_unit_assert=>assert_equals( msg = '2020 is valid' exp = abap_true act = valid ).
 
     "act
     valid = passport->check_iyr( 2010 ).
-
     "assert
     cl_abap_unit_assert=>assert_equals( msg = '2010 is valid' exp = abap_true act = valid ).
 
     "act
     valid = passport->check_iyr( 2009 ).
-
     "assert
     cl_abap_unit_assert=>assert_equals( msg = '2009 is invalid' exp = abap_false act = valid ).
   ENDMETHOD.
@@ -168,14 +155,10 @@ CLASS ltcl_passport IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD setup.
-
     passport = NEW zpassport( ).
-
   ENDMETHOD.
 
-
   METHOD prepare_file.
-
     file  =
  |ecl:gry pid:860033327 eyr:2020 hcl:#fffffd\n| &&
  |byr:1937 iyr:2017 cid:147 hgt:183cm\n| &&
