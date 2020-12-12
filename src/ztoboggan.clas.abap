@@ -23,7 +23,6 @@ CLASS ztoboggan DEFINITION
            ty_slope    TYPE STANDARD TABLE OF ty_slope_part WITH EMPTY KEY,
            ty_map      TYPE STANDARD TABLE OF string_table WITH EMPTY KEY.
 
-
     METHODS set_map
       IMPORTING
         i_map TYPE string.
