@@ -45,7 +45,6 @@ CLASS zpassport DEFINITION
         year         TYPE i
         first        TYPE i
         second       TYPE i
-          PREFERRED PARAMETER year
       RETURNING
         VALUE(valid) TYPE abap_bool.
     METHODS check_hgt
