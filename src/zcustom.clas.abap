@@ -18,6 +18,7 @@ CLASS zcustom DEFINITION
         VALUE(count) TYPE i.
   PROTECTED SECTION.
   PRIVATE SECTION.
+    CONSTANTS alphabet TYPE c LENGTH 26 VALUE 'abcdefghijklmnopqrstuvwxyz'.
     METHODS count_anyone_in_group
       IMPORTING
         answers      TYPE string
@@ -28,7 +29,7 @@ CLASS zcustom DEFINITION
         answers         TYPE string
       RETURNING
         VALUE(text_tab) TYPE string_table.
-    METHODS prepare_riddle
+    METHODS prepare_anyone_riddle
       RETURNING
         VALUE(riddle) TYPE string.
     METHODS prepare_riddle_2
@@ -64,36 +65,32 @@ CLASS zcustom IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD count_anyone_in_group.
-    DATA str TYPE string.
-    str = sy-abcde.
+*    DATA alphabet TYPE string.
+*    alphabet = sy-abcde.
     DO 26 TIMES.
       DATA(off) = sy-index - 1.
-      IF find( val = answers sub = to_lower( str+off(1) ) ) > -1.
+      IF find( val = answers sub = to_lower( alphabet+off(1) ) ) > -1.
         count += 1.
       ENDIF.
     ENDDO.
   ENDMETHOD.
 
   METHOD count_everyone_in_group.
-    SPLIT answers AT space INTO TABLE DATA(answer_tab).
-
-    DATA alphabet TYPE string.
-    alphabet = sy-abcde.
-
+    SPLIT answers AT space INTO TABLE DATA(answer_table).
 
     DO 26 TIMES.
-          DATA(off) = sy-index - 1.
-      DATA(letter) = to_lower( alphabet+off(1) ).
+      DATA(off) = sy-index - 1.
+*      DATA(letter) = to_lower( alphabet+off(1) ).
+      DATA(letter) = alphabet+off(1).
       IF find( val = answers sub = letter ) = -1.
         CONTINUE.
       ENDIF.
 
-
       count += REDUCE int4( INIT c = 1
-                        FOR answer IN answer_tab NEXT
-                          c *= COND #( WHEN find( val = answer sub = letter ) > -1
-                                       THEN 1
-                                       ELSE 0 ) ).
+                            FOR answer IN answer_table NEXT
+                              c *= COND #( WHEN find( val = answer sub = letter ) > -1
+                                           THEN 1
+                                           ELSE 0 ) ).
     ENDDO.
   ENDMETHOD.
 
@@ -112,7 +109,7 @@ CLASS zcustom IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
-  METHOD prepare_riddle.
+  METHOD prepare_anyone_riddle.
 
     riddle =
     |obegcmqadtrhui\n| &&
@@ -2294,7 +2291,7 @@ CLASS zcustom IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD if_oo_adt_classrun~main.
-    out->write( |anyone: | && count_anyone( prepare_riddle(  ) ) ).
+    out->write( |anyone: | && count_anyone( prepare_anyone_riddle(  ) ) ).
     out->write( |evryone: | && count_everyone( prepare_riddle_2(  ) ) ).
   ENDMETHOD.
 

@@ -1,3 +1,5 @@
+CLASS ltcl_customs_declaration DEFINITION DEFERRED.
+CLASS zcustom DEFINITION LOCAL FRIENDS ltcl_customs_declaration.
 CLASS ltcl_customs_declaration DEFINITION FINAL FOR TESTING
   DURATION SHORT
   RISK LEVEL HARMLESS.
@@ -6,12 +8,13 @@ CLASS ltcl_customs_declaration DEFINITION FINAL FOR TESTING
     DATA: customs TYPE REF TO zcustom.
     METHODS:
       answers_one_group FOR TESTING RAISING cx_static_check,
-    answers_four_groups FOR TESTING RAISING cx_static_check,
-    answers_anyone_groups FOR TESTING RAISING cx_static_check,
-    answers_everyone_groups FOR TESTING RAISING cx_static_check,
-    answers_everyone_3from1 FOR TESTING RAISING cx_static_check,
-    answers_everyone_abcfrom3 FOR TESTING RAISING cx_static_check,
-    answers_everyone_abac FOR TESTING RAISING cx_static_check,
+      answers_four_groups FOR TESTING RAISING cx_static_check,
+      answers_anyone_groups FOR TESTING RAISING cx_static_check,
+      answers_everyone_groups FOR TESTING RAISING cx_static_check,
+      answers_everyone_3from1 FOR TESTING RAISING cx_static_check,
+      answers_everyone_abcfrom3 FOR TESTING RAISING cx_static_check,
+      answers_everyone_abac FOR TESTING RAISING cx_static_check,
+    anyone_riddle FOR TESTING RAISING cx_static_check,
       setup.
 ENDCLASS.
 
@@ -72,7 +75,7 @@ CLASS ltcl_customs_declaration IMPLEMENTATION.
     cl_abap_unit_assert=>assert_equals( msg = '4 groups = 3 + 3 + 3 + 1 + 1 = 11' exp = 11 act = count ).
   ENDMETHOD.
 
-METHOD answers_everyone_groups.
+  METHOD answers_everyone_groups.
     DATA(answers) =
       |abc\n| &&
       |\n| &&
@@ -94,14 +97,18 @@ METHOD answers_everyone_groups.
     cl_abap_unit_assert=>assert_equals( msg = '4 groups = 3 + 0 + 1 + 1 + 1 = 6' exp = 6 act = count ).
   ENDMETHOD.
 
-METHOD answers_everyone_3from1.
+  METHOD answers_everyone_3from1.
     DATA(answers) = |abc|.
 
     DATA(count) = customs->count_everyone( answers ).
     cl_abap_unit_assert=>assert_equals( msg = 'abc = 3' exp = 3 act = count ).
   ENDMETHOD.
 
-METHOD answers_everyone_abcfrom3.
+  METHOD anyone_riddle.
+    cl_abap_unit_assert=>assert_equals( msg = 'riddle anyone = 653' exp = 653 act = customs->count_anyone( customs->prepare_anyone_riddle( ) ) ).
+  ENDMETHOD.
+
+  METHOD answers_everyone_abcfrom3.
     DATA(answers) =
       |ab\n| &&
       |ac|.
