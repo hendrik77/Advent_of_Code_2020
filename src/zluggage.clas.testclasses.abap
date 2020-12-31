@@ -42,8 +42,8 @@ CLASS ltcl_luggage IMPLEMENTATION.
   METHOD white_in_light_red.
     DATA(rules) =
       |bright white bags contain 1 shiny gold bag.\n| &&
-      |light red bags contain 1 bright white bag, 2 muted yellow bags.| &&
-      |muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.| &&
+      |light red bags contain 1 bright white bag, 2 muted yellow bags.\n| &&
+      |muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.\n| &&
       |faded blue bags contain no other bags.|.
 
     luggage->set_rules( rules ).
