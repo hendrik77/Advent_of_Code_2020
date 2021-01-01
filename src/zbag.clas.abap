@@ -32,8 +32,6 @@ CLASS zbag DEFINITION
         VALUE(bag_tab) TYPE string_table.
 ENDCLASS.
 
-
-
 CLASS zbag IMPLEMENTATION.
 
   METHOD count_bags.
@@ -44,9 +42,7 @@ CLASS zbag IMPLEMENTATION.
     LOOP AT bag_color_tab INTO DATA(bag).
       APPEND LINES OF get_bags_that_contain( bag ) TO bag_color_tab.
     ENDLOOP.
-*     REDUCE #( INIT x = 0
-*                                                FOR bag IN bag_color_tab NEXT
-*                                                x += count_bags( bag ) ).
+
     SORT bag_color_tab.
     DELETE ADJACENT DUPLICATES FROM bag_color_tab.
     number = lines( bag_color_tab ).
@@ -54,6 +50,42 @@ CLASS zbag IMPLEMENTATION.
 
   METHOD set_rules.
     SPLIT i_rules AT cl_abap_char_utilities=>newline INTO TABLE rules_table.
+  ENDMETHOD.
+
+  METHOD get_bags_that_contain.
+
+    DATA(pattern) = |*contain*{ color }*.|.
+    LOOP AT rules_table INTO DATA(rule) WHERE table_line CP pattern.
+      DATA(bag_color) = substring_before( val = rule sub = ' bags contain' ).
+      IF NOT line_exists( bag_tab[ table_line = bag_color ] ).
+        APPEND bag_color TO bag_tab.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD if_oo_adt_classrun~main.
+    set_rules( build_riddle( ) ).
+    out->write( |Bags that contain at least one shiny gold bag: | && count_bags( 'shiny gold' ) ).
+    out->write( |Shiny gold bag contains: | && contains_bags( 'shiny gold' ) ).
+  ENDMETHOD.
+
+  METHOD contains_bags.
+    DATA(pattern) = |{ color } bags contain* |.
+    FIND REGEX pattern IN TABLE me->rules_table RESULTS DATA(found).
+    CHECK found IS NOT INITIAL.
+
+    DATA(rule) = rules_table[ found-line ].
+    CHECK NOT rule CS 'no other bags.'.
+
+    DATA(content) = substring_after( val = rule sub = 'contain ' ).
+    SPLIT content AT ', ' INTO TABLE DATA(contents).
+    bags = REDUCE #( INIT b = 0
+                     FOR cnt IN contents NEXT
+                     b += CONV i( substring_before( val = condense( cnt ) regex = '\s' ) )
+                       +  CONV i( substring_before( val = condense( cnt ) regex = '\s' ) )
+                       * contains_bags( substring_before(
+                                          val = substring_after( val = condense( cnt ) regex = '\d\s' )
+                                          sub = ' bag' ) ) ).
   ENDMETHOD.
 
   METHOD build_riddle.
@@ -652,46 +684,6 @@ CLASS zbag IMPLEMENTATION.
     |dark maroon bags contain 5 drab bronze bags, 4 bright red bags, 1 posh cyan bag.\n| &&
     |wavy red bags contain 2 mirrored beige bags, 5 muted crimson bags, 5 vibrant orange bags, 3 posh turquoise bags.\n| &&
     |drab brown bags contain 1 faded tan bag, 3 vibrant maroon bags.|.
-  ENDMETHOD.
-
-
-  METHOD get_bags_that_contain.
-
-    DATA(pattern) = |*contain*{ color }*.|.
-    LOOP AT rules_table INTO DATA(rule) WHERE table_line CP pattern.
-      DATA(bag_color) = substring_before( val = rule sub = ' bags contain' ).
-      IF NOT line_exists( bag_tab[ table_line = bag_color ] ).
-        APPEND bag_color TO bag_tab.
-      ENDIF.
-    ENDLOOP.
-
-  ENDMETHOD.
-
-  METHOD if_oo_adt_classrun~main.
-    set_rules( build_riddle( ) ).
-    out->write( |Bags that contain at least one shiny gold bag: | && count_bags( 'shiny gold' ) ).
-    out->write( |Shiny gold bag contains: | && contains_bags( 'shiny gold' ) ).
-  ENDMETHOD.
-
-
-  METHOD contains_bags.
-    DATA(pattern) = |{ color } bags contain* |.
-    FIND REGEX pattern IN TABLE me->rules_table RESULTS DATA(found).
-    CHECK found IS NOT INITIAL.
-
-    DATA(rule) = rules_table[ found-line ].
-    CHECK NOT rule CS 'no other bags.'.
-
-    DATA(content) = substring_after( val = rule sub = 'contain ' ).
-    SPLIT content AT ', ' INTO TABLE DATA(contents).
-    bags = REDUCE #( INIT b = 0
-                     FOR cnt IN contents NEXT
-                     b += CONV i( substring_before( val = condense( cnt ) regex = '\s' ) )
-                       +  CONV i( substring_before( val = condense( cnt ) regex = '\s' ) )
-                       * contains_bags( substring_before(
-                                          val = substring_after( val = condense( cnt ) regex = '\d\s' )
-                                          sub = ' bag' ) ) ).
-
   ENDMETHOD.
 
 ENDCLASS.
