@@ -38,8 +38,6 @@ CLASS zxmas DEFINITION
       RETURNING VALUE(set)     TYPE ty_puzzle.
 ENDCLASS.
 
-
-
 CLASS zxmas IMPLEMENTATION.
 
   METHOD build_puzzle_input.
@@ -1050,7 +1048,6 @@ CLASS zxmas IMPLEMENTATION.
     DATA(pointer) = preamble_length + 1.
 
     WHILE pointer <= lines( puzzle ).
-
       IF is_valid( pointer ) = abap_false.
         invalid_number = puzzle[ pointer ].
         RETURN.
